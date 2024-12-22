@@ -1,7 +1,9 @@
-import { Controller, Get, Put, Post, Body, Param, Delete, ParseIntPipe, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Put, Post, Body, Param, Delete, Req, UseGuards, ParseIntPipe, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { CreateUserDto } from './dtos/user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -25,11 +27,15 @@ export class UsersController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   async updateUser(
+    @Req() req: any,
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateData: { name?: string; email?: string, phone?: string },
+    @Body() updateData: UpdateUserDto,
   ) {
-    return this.usersService.updateUser(id, updateData);
+    const userid = req.user.sub as number;
+    if(id!=userid) throw new BadRequestException('Invalid user login');
+    return this.usersService.updateUser(userid, updateData);
   }
 
   @Delete(':id')

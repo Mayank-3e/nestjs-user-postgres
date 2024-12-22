@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto } from './dtos/user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -19,24 +21,32 @@ export class UsersService {
     return this.usersRepository.findOneBy({ id });
   }
 
-  create(user: CreateUserDto): Promise<User> {
-    return this.usersRepository.save(user);
+  async create(user: CreateUserDto): Promise<User> {
+    const userExists = await this.usersRepository.findOneBy({ email: user.email });
+    if(userExists) throw new BadRequestException('User exists')
+    return this.usersRepository.save({
+      ...user,
+      password: bcrypt.hashSync(user.password, 10)
+    });
   }
 
   async remove(id: number): Promise<void> {
     await this.usersRepository.delete(id);
   }
 
-  async updateUser(id: number, updates:{
-    name?: string, email?: string, phone?: string
-  }): Promise<User> {
+  async updateUser(id: number, updates: UpdateUserDto): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     if (updates.name) user.name = updates.name;
-    if (updates.email) user.email = updates.email;
     if (updates.phone) user.phone = updates.phone;
     return this.usersRepository.save(user);
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ email });
+    if(!user) throw new NotFoundException('User not found')
+      return user
   }
 }
