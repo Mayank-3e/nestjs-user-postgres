@@ -23,7 +23,7 @@ export class UsersService {
 
   async create(user: CreateUserDto): Promise<User> {
     const userExists = await this.usersRepository.findOneBy({ email: user.email });
-    if(userExists) throw new BadRequestException('User exists')
+    if (userExists) throw new BadRequestException('User exists')
     return this.usersRepository.save({
       ...user,
       password: bcrypt.hashSync(user.password, 10)
@@ -46,7 +46,7 @@ export class UsersService {
 
   async findByEmail(email: string): Promise<User> {
     const user = await this.usersRepository.findOneBy({ email });
-    if(!user) throw new NotFoundException('User not found')
-      return user
+    if (!user) throw new NotFoundException('User not found');
+    return user
   }
 }

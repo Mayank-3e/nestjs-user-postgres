@@ -33,7 +33,7 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateData: UpdateUserDto,
   ) {
-    const userid = req.user.sub as number;
+    const userid = req.user.id as number;
     if(id!=userid) throw new BadRequestException('Invalid user login');
     return this.usersService.updateUser(userid, updateData);
   }

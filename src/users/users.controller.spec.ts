@@ -32,7 +32,7 @@ describe('UsersController', () => {
   });
 
   it('should update a user successfully when id matches req.user.id', async () => {
-    const req = { user: { sub: 1 } };
+    const req = { user: { id: 1 } };
     const id = 1;
     const updateData: UpdateUserDto = { name: 'Jane Doe' };
 
@@ -46,7 +46,7 @@ describe('UsersController', () => {
   });
 
   it('should throw NotFoundException if user is not found', async () => {
-    const req = { user: { sub: 1 } };
+    const req = { user: { id: 1 } };
     const id = 1;
     const updateData: UpdateUserDto = { name: 'Jane Doe' };
 
