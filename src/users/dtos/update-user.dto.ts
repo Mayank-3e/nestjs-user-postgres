@@ -4,11 +4,11 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   @MinLength(3)
-  name: string;
+  name?: string;
 
   @IsOptional()
   @IsString()
   @Length(10,10)
   @Matches(/^\d{10}$/, { message: 'Phone number must consist of exactly 10 digits' })
-  phone: string;
+  phone?: string;
 }
